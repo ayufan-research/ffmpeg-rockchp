@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['utility_20functions',['Utility functions',['../group__lavc__misc.html',1,'']]],
+  ['utility_20functions',['Utility functions',['../group__lavf__misc.html',1,'']]],
+  ['u16',['u16',['../unionav__alias.html#a79c01861a51e254641c99be17f8aa4f0',1,'av_alias']]],
+  ['u32',['u32',['../unionav__alias.html#a98d19f5ed2320978bb0a25d387601b7d',1,'av_alias']]],
+  ['u64',['u64',['../unionav__alias.html#a6a73a59728e1b8d7d06123f5af4d59f7',1,'av_alias']]],
+  ['u8',['u8',['../unionav__alias.html#a7f6d1b60592207433aabf0f688f93b1d',1,'av_alias']]],
+  ['unaligned_5f16',['unaligned_16',['../unionunaligned__16.html',1,'']]],
+  ['unaligned_5f32',['unaligned_32',['../unionunaligned__32.html',1,'']]],
+  ['unaligned_5f64',['unaligned_64',['../unionunaligned__64.html',1,'']]],
+  ['uninit',['uninit',['../structAVFilter.html#a60eec302523ab576b6c6b226e939e7d8',1,'AVFilter::uninit()'],['../structAVHWAccel.html#a19115ab5af7bf9e638889ffee0b4e232',1,'AVHWAccel::uninit()']]],
+  ['unit',['unit',['../structAVOption.html#a248d65a7cab7d7bd3a4eb51212ab0e49',1,'AVOption']]],
+  ['unlock',['unlock',['../structAVD3D11VADeviceContext.html#a646c40b40f9faeacb10245586d0f129b',1,'AVD3D11VADeviceContext']]],
+  ['unsigned_5fintra',['unsigned_intra',['../structxvmc__pix__fmt.html#a19d652ba10cd3efe9b0540fdd76cd580',1,'xvmc_pix_fmt']]],
+  ['update_5fchecksum',['update_checksum',['../structAVIOContext.html#a7ff26703ccfb39cdd38fd49f5a95796c',1,'AVIOContext']]],
+  ['update_5finitial_5fdurations_5fdone',['update_initial_durations_done',['../structAVStream.html#a93fae347b93594cbe8ce7d414519b78a',1,'AVStream']]],
+  ['update_5fthread_5fcontext',['update_thread_context',['../structAVCodec.html#a286e505d913763a6bb9ea2bfee00f2c3',1,'AVCodec']]],
+  ['url_5fcontext',['url_context',['../structAVIODirContext.html#a10cfa45d4d4a2c5e3c9ff50c4702815d',1,'AVIODirContext']]],
+  ['usage',['usage',['../avio__dir__cmd_8c.html#a47364cb762e89cc85a4c29df5aff172e',1,'avio_dir_cmd.c']]],
+  ['use_5fwallclock_5fas_5ftimestamps',['use_wallclock_as_timestamps',['../structAVFormatContext.html#a90251622aa2b78badbb846274aff4633',1,'AVFormatContext']]],
+  ['user_5fid',['user_id',['../structAVIODirEntry.html#a0b85319602d578b0db7d90bf9cb5d33d',1,'AVIODirEntry']]],
+  ['user_5fopaque',['user_opaque',['../structAVHWDeviceContext.html#ae2cfd2b41b89acd81c495d1a1d9124c5',1,'AVHWDeviceContext::user_opaque()'],['../structAVHWFramesContext.html#a4d6e4c17632bd6770654b7627722222e',1,'AVHWFramesContext::user_opaque()']]],
+  ['utf8',['utf8',['../structAVIODirEntry.html#adac43a980b06d1733d0fa7eb710264c9',1,'AVIODirEntry']]]
+];

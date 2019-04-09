@@ -1,0 +1,162 @@
+--- libavcodec/rkmppdec.c
++++ libavcodec/rkmppdec.c
+@@ -317,17 +322,154 @@ static void rkmpp_release_frame(void *opaque, uint8_t *data)
+     av_free(desc);
+ }
+ 
++static int rkmpp_mem_buffer_to_frame(AVCodecContext *avctx, MppFrame mppframe,
++                                     MppBuffer buffer, AVFrame *frame)
++{
++    unsigned h_stride = mpp_frame_get_hor_stride(mppframe);
++    unsigned linesize, i, width = frame->width;
++    uint8_t *buf_ptr = mpp_buffer_get_ptr(buffer);
++    int ret;
++
++    if (!buf_ptr)
++        return AVERROR_UNKNOWN; // no buffer pointer
++
++    if (mpp_frame_get_fmt(mppframe) != MPP_FMT_YUV420SP)
++        return AVERROR_UNKNOWN; // unexpected format
++
++    if ((ret = ff_get_buffer(avctx, frame, 0)) < 0)
++        return ret;
++
++    linesize = frame->linesize[0];
++    if (h_stride == linesize) {
++        memcpy(frame->data[0], buf_ptr, linesize * frame->height);
++    } else {
++        uint8_t *src = buf_ptr;
++        uint8_t *end = src + h_stride * frame->height;
++        uint8_t *y = frame->data[0];
++
++        for (; src < end; src += h_stride) {
++            memcpy(y, src, width);
++            y += linesize;
++        }
++    }
++
++    // NV12    - YYYY... UV UV...
++    // YUV420P - YYYY... UU... VV...
++    buf_ptr += h_stride * mpp_frame_get_ver_stride(mppframe);
++    if (frame->format == AV_PIX_FMT_YUV420P) {
++        for (i = 0; i < frame->height / 2; ++i) {
++            uint32_t *c = (void*) &buf_ptr[i * h_stride];
++            uint32_t *e = c + (width - 1) / 4;
++            uint16_t *u = (void*) &frame->data[1][i * frame->linesize[1]];
++            uint16_t *v = (void*) &frame->data[2][i * frame->linesize[2]];
++
++#if HAVE_NEON
++            int vectors = width / 32;
++
++            while (--vectors >= 0) {
++                const uint8x16_t c0 = vld1q_u8((uint8_t*) c);
++                const uint8x16_t c1 = vld1q_u8((uint8_t*) c + 16);
++                const uint8x16x2_t dst = vuzpq_u8(c0, c1);
++
++                vst1q_u8((uint8_t*) u, dst.val[0]);
++                vst1q_u8((uint8_t*) v, dst.val[1]);
++                c += 8;
++                u += 8;
++                v += 8;
++            }
++#endif
++            while (c <= e) {
++                uint32_t uv = *(c++);
++                *(u++) = (uv & 0xff) | ((uv >> 8) & 0xff00);
++                *(v++) = ((uv >> 8) & 0xff) | ((uv >> 16) & 0xff00);
++            }
++        }
++    } else if (h_stride == frame->linesize[1]) {
++        memcpy(frame->data[1], buf_ptr, h_stride * frame->height / 2);
++    } else {
++        linesize = frame->linesize[1];
++        for (i = 0; i < frame->height / 2; ++i)
++            memcpy(frame->data[1] + i * linesize, buf_ptr + i * h_stride, width);
++    }
++    mpp_frame_deinit(&mppframe);
++    return 0;
++}
++
++static int rkmpp_drm_buffer_to_frame(RKMPPDecodeContext *rk_context, MppFrame mppframe,
++                                     MppBuffer buffer, AVFrame *frame)
+ {
+     RKMPPDecoder *decoder = (RKMPPDecoder *)rk_context->decoder_ref->data;
+     RKMPPFrameContext *framecontext = NULL;
+     AVBufferRef *framecontextref = NULL;
++    AVDRMFrameDescriptor *desc = NULL;
++    AVDRMLayerDescriptor *layer = NULL;
++
++    desc = av_mallocz(sizeof(AVDRMFrameDescriptor));
++    if (!desc)
++        goto fail;
++
++    desc->nb_objects = 1;
++    desc->objects[0].fd = mpp_buffer_get_fd(buffer);
++    desc->objects[0].size = mpp_buffer_get_size(buffer);
++
++    desc->nb_layers = 1;
++    layer = &desc->layers[0];
++    layer->format = rkmpp_get_frameformat(mpp_frame_get_fmt(mppframe));
++
++    layer->nb_planes = 2;
++
++    layer->planes[0].object_index = 0;
++    layer->planes[0].offset = 0;
++    layer->planes[0].pitch = mpp_frame_get_hor_stride(mppframe);
++
++    layer->planes[1].object_index = 0;
++    layer->planes[1].offset = layer->planes[0].pitch * mpp_frame_get_ver_stride(mppframe);
++    layer->planes[1].pitch = layer->planes[0].pitch;
++
++    // we also allocate a struct in buf[0] that will allow to hold additionnal information
++    // for releasing properly MPP frames and decoder
++    framecontextref = av_buffer_allocz(sizeof(*framecontext));
++    if (!framecontextref)
++        goto fail;
++
++    // MPP decoder needs to be closed only when all frames have been released.
++    framecontext = (RKMPPFrameContext *)framecontextref->data;
++    framecontext->decoder_ref = av_buffer_ref(rk_context->decoder_ref);
++    framecontext->frame = mppframe;
++
++    frame->data[0]  = (uint8_t *)desc;
++    frame->buf[0]   = av_buffer_create((uint8_t *)desc, sizeof(*desc), rkmpp_release_frame,
++                                       framecontextref, AV_BUFFER_FLAG_READONLY);
++
++    if (!frame->buf[0])
++        goto fail;
++
++    frame->hw_frames_ctx = av_buffer_ref(decoder->frames_ref);
++    if (!frame->hw_frames_ctx)
++        goto fail;
++
++    return 0;
++
++fail:
++    if (framecontext)
++        av_buffer_unref(&framecontext->decoder_ref);
++
++    if (framecontextref)
++        av_buffer_unref(&framecontextref);
++
++    if (desc)
++        av_free(desc);
++
++    return AVERROR(ENOMEM);
++}
+
+
+
++
++static int rkmpp_retrieve_frame(AVCodecContext *avctx, AVFrame *frame)
++{
++    RKMPPDecodeContext *rk_context = avctx->priv_data;
++    RKMPPDecoder *decoder = (RKMPPDecoder *)rk_context->decoder_ref->data;
+     int ret;
+     MppFrame mppframe = NULL;
+     MppBuffer buffer = NULL;
+-    AVDRMFrameDescriptor *desc = NULL;
+-    AVDRMLayerDescriptor *layer = NULL;
+     int retrycount = 0;
+     int mode;
+     MppFrameFormat mppformat;

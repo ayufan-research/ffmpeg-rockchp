@@ -1,0 +1,25 @@
+ffmpeg version 3.4.git-1ayufan2 Copyright (c) 2000-2018 the FFmpeg developers
+  built with gcc 7 (Ubuntu/Linaro 7.3.0-27ubuntu1~18.04)
+  configuration: --prefix=/usr --extra-version=1ayufan2 --toolchain=hardened --libdir=/usr/lib/arm-linux-gnueabihf --incdir=/usr/include/arm-linux-gnueabihf --enable-gpl --disable-stripping --enable-avresample --disable-filter=resample --enable-avisynth --enable-gnutls --enable-ladspa --enable-libass --enable-libbluray --enable-libbs2b --enable-libcaca --enable-libcdio --enable-libflite --enable-libfontconfig --enable-libfreetype --enable-libfribidi --enable-libgme --enable-libgsm --enable-libjack --enable-libmp3lame --enable-libmysofa --enable-libopenjpeg --enable-libopenmpt --enable-libopus --enable-libpulse --enable-librubberband --enable-librsvg --enable-libshine --enable-libsnappy --enable-libsoxr --enable-libspeex --enable-libssh --enable-libtheora --enable-libtwolame --enable-libvorbis --enable-libvpx --enable-libwavpack --enable-libwebp --enable-libx265 --enable-libxml2 --enable-libxvid --enable-libzmq --enable-libzvbi --enable-lv2 --enable-omx --enable-openal --enable-opengl --enable-sdl2 --enable-rkmpp --enable-version3 --enable-libdc1394 --enable-libdrm --enable-libiec61883 --enable-chromaprint --enable-frei0r --enable-libopencv --enable-libx264 --cross-prefix=arm-linux-gnueabihf- --arch=armhf --target-os=linux --cc='distcc arm-linux-gnueabihf-gcc' --cxx='distcc arm-linux-gnueabihf-g++' --enable-shared
+  libavutil      56.  7.100 / 56.  7.100
+  libavcodec     58.  9.100 / 58.  9.100
+  libavformat    58.  3.100 / 58.  3.100
+  libavdevice    58.  0.100 / 58.  0.100
+  libavfilter     7. 11.101 /  7. 11.101
+  libavresample   4.  0.  0 /  4.  0.  0
+  libswscale      5.  0.101 /  5.  0.101
+  libswresample   3.  0.101 /  3.  0.101
+  libpostproc    55.  0.100 / 55.  0.100
+[rawvideo @ 0xab595810] Estimating duration from bitrate, this may be inaccurate
+Input #0, rawvideo, from '/usr/src/ffmpeg-3.5~git20180113/debian/standard/tests/data/vsynth1.yuv':
+  Duration: 00:00:02.00, start: 0.000000, bitrate: 30412 kb/s
+    Stream #0:0: Video: rawvideo (I420 / 0x30323449), yuv420p, 352x288, 30412 kb/s, 25 tbr, 25 tbn, 25 tbc
+Please use -q:a or -q:v, -qscale is ambiguous
+Stream mapping:
+  Stream #0:0 -> #0:0 (rawvideo (native) -> svq1 (native))
+Output #0, mov, to '/usr/src/ffmpeg-3.5~git20180113/debian/standard/tests/data/fate/vsynth1-svq1.mov':
+    Stream #0:0: Video: svq1 (SVQ1 / 0x31515653), yuv410p, 352x288, q=2-31, 200 kb/s, 25 fps, 12800 tbn, 25 tbc
+    Metadata:
+      encoder         : Lavc svq1
+frame=   50 fps=3.1 q=3.0 Lsize=    1303kB time=00:00:01.96 bitrate=5445.6kbits/s speed=0.121x    
+video:1302kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: 0.070877%
